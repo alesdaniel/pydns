@@ -32,10 +32,12 @@
 #OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 # 28/03/2016 - Version Inicial - Daniel.
+# 07/04/2016 - Agrega log - Daniel.
 
 import sys
 import re
 import ssl
+import logging
 import urllib.request, urllib.parse, urllib.error
 
 pagina = ''
