@@ -38,6 +38,7 @@ import sys
 import re
 import ssl
 import logging
+import socket
 import urllib.request, urllib.parse, urllib.error
 
 pagina = ''
@@ -74,38 +75,87 @@ def actualiza_ip():
         print(e);
     #https: // dyn.dns.he.net / nic / update?hostname = dyn.example.com & password = password & myip = 192.168.0.1
 
+#Compara que la ultima ip sea igual a la ultima grabada
+def consulta(ips):
+    try:
+        a = open('ip.txt', 'r+')
+    except IOError:
+        a = open('ip.txt', 'w+')
+    logging.basicConfig(format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p', filename='ips_his.log', level=logging.INFO)
+    str = a.read()
+    if str == ips:
+        a.closed
+        return True
+    else:
+        a.write(ips)
+        logging.info(ips)
+        a.closed
+        return False
+
 # Busca dentro del html o texto devuelto la direccion ip
 def busca_ip():
     global ips
+    logging.basicConfig(format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p', filename='pydns.log',
+                        level=logging.ERROR)
     ips = re.findall(r'[0-9]+(?:\.[0-9]+){3}', pagina)
     print(ips[0])
+    try:
+        socket.inet_aton(ips[0])
+    except TypeError:
+        print("type")
+        logging.error("busca_ip() type " + ips[0])
+        exit(1)
+    except socket.error:
+        print("sock")
+        logging.error("busca_ip() sock " + ips[0])
+        exit(1)
 
+    if consulta(ips[0]):
+        pass
+    else:
+        actualiza_ip()
 
 def descarga():
     global pagina
+    logging.basicConfig(format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p', filename='pydns.log',
+                        level=logging.ERROR)
     try:
         #html = urllib.request.urlopen("http://www.see-my-ip.com/")
         html = urllib.request.urlopen("http://checkip.dyndns.org/")
         pagina = html.read().decode("latin1", 'ignore')
     except urllib.error.URLError as e:
         print(e);
+        logging.error("descarga() " + e)
         pagina = ''
     except socket.error as e:
+        print(e);
+        logging.error("descarga() " + e)
         pagina = ''
     except socket.timeout as e:
+        print(e);
+        logging.error("descarga() " + e)
         pagina = ''
     except UnicodeEncodeError as e:
+        print(e);
+        logging.error("descarga() " + e)
         pagina = ''
     except http.client.BadStatusLine as e:
+        print(e);
+        logging.error("descarga() " + e)
         pagina = ''
     except http.client.IncompleteRead as e:
+        print(e);
+        logging.error("descarga() " + e)
         pagina = ''
     except urllib.error.HTTPError as e:
+        print(e);
+        logging.error("descarga() " + e)
         pagina = ''
 
     if len(pagina) > 0:
         print(pagina)
     else:
+        logging.error("descarga() len(pagina) = 0")
         exit(1)
 
 
@@ -116,4 +166,4 @@ if __name__ == "__main__":
 
     descarga()
     busca_ip()
-    actualiza_ip()
+
