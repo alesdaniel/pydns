@@ -3,7 +3,7 @@
 # Script de actualizacion automatica para Hurricane Electric DNS
 # Testeado en Python 3.4 windows, Debian
 #BSD
-#Copyright (c) 2016, Ales Daniel
+#Copyright (c) 2016, Ales Daniel alesdaniel77@gmail.com
 #All rights reserved.
 #
 #Redistribution and use in source and binary forms, with or without
@@ -77,25 +77,28 @@ def actualiza_ip():
 
 #Compara que la ultima ip sea igual a la ultima grabada
 def consulta(ips):
+    logging.basicConfig(format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p', filename='py_dns.log',
+                        level=logging.ERROR)
     try:
         a = open('ip.txt', 'r+')
     except IOError:
         a = open('ip.txt', 'w+')
-    logging.basicConfig(format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p', filename='ips_his.log', level=logging.INFO)
     str = a.read()
     if str == ips:
         a.closed
         return True
     else:
+        a.close()
+        a = open('ip.txt', 'w+')
         a.write(ips)
-        logging.info(ips)
+        logging.error("Actualizacion IP: " + ips)
         a.closed
         return False
 
 # Busca dentro del html o texto devuelto la direccion ip
 def busca_ip():
     global ips
-    logging.basicConfig(format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p', filename='pydns.log',
+    logging.basicConfig(format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p', filename='py_dns.log',
                         level=logging.ERROR)
     ips = re.findall(r'[0-9]+(?:\.[0-9]+){3}', pagina)
     print(ips[0])
@@ -117,7 +120,7 @@ def busca_ip():
 
 def descarga():
     global pagina
-    logging.basicConfig(format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p', filename='pydns.log',
+    logging.basicConfig(format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p', filename='py_dns.log',
                         level=logging.ERROR)
     try:
         #html = urllib.request.urlopen("http://www.see-my-ip.com/")
