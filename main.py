@@ -46,6 +46,8 @@ ips = ''
 
 def actualiza_ip():
     global ips
+    logging.basicConfig(format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p', filename='py_dns.log',
+                        level=logging.ERROR)
     datos = {}
     #Datos de pagina a actualizar IPs
     datos['hostname'] = 'rsync.petro-tandil.com.ar'
@@ -60,18 +62,25 @@ def actualiza_ip():
     try:
         datos = urllib.request.urlopen(urlc, context=context)
     except urllib.error.URLError as e:
+        logging.error("actualiza_ip() " + e)
         print(e);
     except socket.error as e:
+        logging.error("actualiza_ip() " + e)
         print(e);
     except socket.timeout as e:
+        logging.error("actualiza_ip() " + e)
         print(e);
     except UnicodeEncodeError as e:
+        logging.error("actualiza_ip() " + e)
         print(e);
     except http.client.BadStatusLine as e:
+        logging.error("actualiza_ip() " + e)
         print(e);
     except http.client.IncompleteRead as e:
+        logging.error("actualiza_ip() " + e)
         print(e);
     except urllib.error.HTTPError as e:
+        logging.error("actualiza_ip() " + e)
         print(e);
     #https: // dyn.dns.he.net / nic / update?hostname = dyn.example.com & password = password & myip = 192.168.0.1
 
